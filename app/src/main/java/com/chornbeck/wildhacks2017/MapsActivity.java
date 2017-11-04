@@ -112,6 +112,8 @@ class Concern {
     int a = 5;
 }
 
+public class sen
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
