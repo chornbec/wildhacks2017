@@ -11,12 +11,17 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.Ringtone;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -65,12 +70,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 class Concern {
-  public int cid;
-  public double lat;
-  public double lng;
-  public String reason;
-  public String time;
-  public String concern_type;
+    public int cid;
+    public double lat;
+    public double lng;
+    public String reason;
+    public String time;
+    public String concern_type;
 
     JSONObject toJSONObject() {
         JSONObject o = new JSONObject();
@@ -80,7 +85,9 @@ class Concern {
             o.put("reason", reason);
             o.put("time", time);
             o.put("concern_type", concern_type);
-        } catch (JSONException e) { return null; }
+        } catch (JSONException e) {
+            return null;
+        }
         return o;
     }
 
@@ -103,16 +110,88 @@ class Concern {
 
     public boolean equals(Object o) {
         if (!(o instanceof Concern)) return false;
-        return ((Concern)o).cid == this.cid;
+        return ((Concern) o).cid == this.cid;
     }
 
     public int hashCode() {
         return cid;
     }
+
     int a = 5;
 }
 
-public class sen
+public class MainActivity extends AppCompatActivity {
+
+    private Button button;
+    private TextView textView;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        button = (Button) findViewById(R.id.button);
+        textView = (TextView) findViewById(R.id.textView);
+
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+        };
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[] {
+                        Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.INTERNET
+                }, 10 );
+                return;
+            }
+        }else{
+            configureButton();
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case 10:
+                if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    configureButton();
+                return;
+        }
+    }
+
+    private void configureButton() {
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
+            }
+        });
+
+    }
+}
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
