@@ -4,12 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Wildhacks2017.iml" filepath="$PROJECT_DIR$/Wildhacks2017.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-<<<<<<< HEAD
-=======
-      <module fileurl="file://C:\Users\MLH-Admin\Documents\wildhacks2017\app\app.iml" filepath="C:\Users\MLH-Admin\Documents\wildhacks2017\app\app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/wildhacks2017.iml" filepath="$PROJECT_DIR$/wildhacks2017.iml" />
-      <module fileurl="file://C:\Users\MLH-Admin\Documents\wildhacks2017\wildhacks2017.iml" filepath="C:\Users\MLH-Admin\Documents\wildhacks2017\wildhacks2017.iml" />
->>>>>>> ff5e67e899b4ff6f37ace0683a804b4b7d1f9615
     </modules>
   </component>
 </project>

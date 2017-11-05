@@ -113,33 +113,6 @@ class Concern {
         return cid;
     }
 }
-public void locationSend() {
-    // Write a message to the database
-    FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference myRef = database.getReference("message");
-
-<<<<<<< HEAD
-=======
-    myRef.setValue("Hello, World!");
-
-    // Read from the database
-    myRef.addValueEventListener(new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            // This method is called once with the initial value and again
-            // whenever data at this location is updated.
-            String value = dataSnapshot.getValue(String.class);
-            Log.d(TAG, "Value is: " + value);
-        }
-
-        @Override
-        public void onCancelled(DatabaseError error) {
-            // Failed to read value
-            Log.w(TAG, "Failed to read value.", error.toException());
-        }
-    });
-}
->>>>>>> ff5e67e899b4ff6f37ace0683a804b4b7d1f9615
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
