@@ -14,6 +14,7 @@ import android.location.Location;
 import android.media.Ringtone;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -36,6 +37,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.felhr.usbserial.UsbSerialDevice;
 import com.felhr.usbserial.UsbSerialInterface;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
@@ -46,6 +48,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import org.json.JSONArray;
@@ -109,10 +112,8 @@ class Concern {
     public int hashCode() {
         return cid;
     }
-    int a = 5;
 }
 
-public class sen
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -124,11 +125,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<Marker> markers;
     private Map<Marker, String> messages;
 
+    public static final String EXTRA_MESSAGE = "com.chornbeck.wildhacks2017.MESSAGE";
+
     private Map<Concern, Marker> dbMessages;
 
     String concernUrl = "http://dubhacks.localtunnel.me/concerns";
 
-    String policeReportUrl = "https://data.seattle.gov/resource/y7pv-r3kh.json?$limit=20&$order=date_reported%20desc";
+    String policeReportUrl = "https://data.chicago.gov/resource/y7pv-r3kh.json?$limit=20&$order=date_reported%20desc";
 
     public final String ACTION_USB_PERMISSION = "com.hariharan.arduinousb.USB_PERMISSION";
     public final String PHONE_NUMBER = "206-661-3732";
@@ -149,7 +152,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Button connectArduino;
 
     RequestQueue queue;
-
+    String concernUri = "http://coreyhornbeck.me/documents/dataconcern.json";
+    String policeReportUri = "http://coreyhornbeck.me/documents/data.json?$limit=20&$order=date_reported%20desc";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         context = this;
@@ -180,8 +184,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Timer timer = new Timer();
 
         getPoliceData();
-
-
 
         // Schedule to run after every 3 second(3000 millisecond)
         timer.scheduleAtFixedRate( new MarkerTask(), 3000, 3000);
@@ -218,10 +220,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     pendingMarker.remove();
                     pendingMarker = null;
                 }
+
             }
         });
 
     }
+
+    public void sendMessage(View view) {
+        Intent intent = new Intent(this, DisplayMessageActivity.class);
+        EditText editText = (EditText) findViewById(R.id.messageEditText);
+        String message = editText.getText().toString();
+        intent.putExtra(EXTRA_MESSAGE, message);
+        startActivity(intent);
+    }
+
 
     public void sendWarningLights(View view) {
         if (serialPort != null) {
@@ -376,12 +388,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        lastKnownLoc = new LatLng(0, 0);
+        LatLng lastKnownLoc = new LatLng(42.053443, -87.672529);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
-        }
+        //Zooms the camera in:
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLoc,13));
+
+
 
         mMap.setOnMapClickListener(new OnMapClickListener() {
 
@@ -406,16 +418,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap.setOnMyLocationChangeListener(new OnMyLocationChangeListener(){
             public void onMyLocationChange(Location location) {
-                LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-                if (lastKnownLoc.equals(new LatLng(0, 0))) {
+                LatLng loc = new LatLng(42.053443, -87.672529);
+                if (true) {
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
                     mMap.moveCamera(CameraUpdateFactory.zoomTo(10));
-                 }
-                lastKnownLoc = loc;
+                }
 
                 checkNearbyMarkers();
             }
         });
+
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -453,7 +465,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
   public void getPoliceData() {
 
     JsonArrayRequest jsArrayReq = new JsonArrayRequest
-      (Request.Method.GET, policeReportUrl, null, new Response.Listener<JSONArray>() {
+      (Request.Method.GET, policeReportUri, null, new Response.Listener<JSONArray>() {
 
         @Override
         public void onResponse(JSONArray response) {
@@ -482,56 +494,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
           Log.d("REQUEST", "Error: " + error.toString());
         }
       });
-
     queue.add(jsArrayReq);
   }
 
 
   public void getConcerns() {
-    JsonObjectRequest jsObjRequest = new JsonObjectRequest
-      (Request.Method.GET, concernUrl, null, new Response.Listener<JSONObject>() {
+      JsonArrayRequest jsArrayReq = new JsonArrayRequest
+              (Request.Method.GET, concernUri, null, new Response.Listener<JSONArray>() {
 
-        @Override
-        public void onResponse(JSONObject response) {
-          Log.d("REQUEST", "Response: " + response.toString());
-            try {
-                JSONArray concerns = response.getJSONArray("concerns");
-                Set<Integer> seenCids = new HashSet<>();
-                for (int i = 0; i < concerns.length(); i++) {
-                    Concern c = Concern.fromJSONObject(concerns.getJSONObject(i));
-                    seenCids.add(c.cid);
-                    if (!dbMessages.containsKey(c)) {
-                        Marker newMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(c.lat, c.lng)).title(c.concern_type).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
-                        messages.put(newMarker, c.reason);
-                        dbMessages.put(c, newMarker);
-                    }
-                }
+                  @Override
+                  public void onResponse(JSONArray response) {
+                      Log.d("REQUEST", "Response: " + response.toString());
+                      try {
+                          for (int i = 0; i < response.length(); i++) {
+                              JSONObject r = response.getJSONObject(i);
 
-                Set<Concern> copy = new HashSet<>(dbMessages.keySet());
-                for (Concern c2 : copy) {
-                  if (!seenCids.contains(c2.cid)) {
-                    Marker m = dbMessages.remove(c2);
-                    m.remove();
+                              MarkerOptions mo = new MarkerOptions()
+                                      .position(new LatLng(r.getDouble("latitude"), r.getDouble("longitude")))
+                                      .title(r.getString("offense_type"))
+                                      .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+
+                              Marker m = mMap.addMarker(mo);
+                              messages.put(m, "Student-reported incident: " + r.getString("date_reported") + " at " + r.getString("hundred_block_location"));
+
+                          }
+                      } catch (JSONException e) {
+                          Log.d("JSON", e.getStackTrace().toString());
+                      }
                   }
-                }
-            } catch (JSONException e) {
-                Log.d("JSON", e.getStackTrace().toString());
-            }
-        }
-      }, new Response.ErrorListener() {
+              }, new Response.ErrorListener() {
 
-        @Override
-        public void onErrorResponse(VolleyError error) {
-          Log.d("REQUEST", "Error: " + error.toString());
-        }
-      });
-
-      queue.add(jsObjRequest);
+                  @Override
+                  public void onErrorResponse(VolleyError error) {
+                      Log.d("REQUEST", "Error: " + error.toString());
+                  }
+              });
+      queue.add(jsArrayReq);
     }
 
     public void postConcern(Concern c) {
       JsonObjectRequest jsObjRequest = new JsonObjectRequest
-        (Request.Method.POST, concernUrl, c.toJSONObject(), new Response.Listener<JSONObject>() {
+        (Request.Method.POST, concernUri, c.toJSONObject(), new Response.Listener<JSONObject>() {
 
           @Override
           public void onResponse(JSONObject response) {
