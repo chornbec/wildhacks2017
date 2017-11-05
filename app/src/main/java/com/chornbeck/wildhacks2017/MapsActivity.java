@@ -111,7 +111,7 @@ class Concern {
     }
     int a = 5;
 }
-
+public void locationSend() {
     // Write a message to the database
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("message");
@@ -134,6 +134,7 @@ class Concern {
             Log.w(TAG, "Failed to read value.", error.toException());
         }
     });
+}
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
