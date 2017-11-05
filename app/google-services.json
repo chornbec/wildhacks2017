@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "437214368632",
+    "firebase_url": "https://wildhacks2017-7ff28.firebaseio.com",
+    "project_id": "wildhacks2017-7ff28",
+    "storage_bucket": "wildhacks2017-7ff28.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:437214368632:android:3a277f61cf15bf5e",
+        "android_client_info": {
+          "package_name": "com.chornbeck.wildhacks2017"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "437214368632-fggogrl710glnhsk27t2sdoatuukh5dc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chornbeck.wildhacks2017",
+            "certificate_hash": "d72bfb0abf47475137ff4bfce20a078c6432d268"
+          }
+        },
+        {
+          "client_id": "437214368632-l0dvgajq8utc5plvugm19ak34vpslq4t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClirfYz98bew5Q9gVFC7L2lwzXFLeph0c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "437214368632-l0dvgajq8utc5plvugm19ak34vpslq4t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
